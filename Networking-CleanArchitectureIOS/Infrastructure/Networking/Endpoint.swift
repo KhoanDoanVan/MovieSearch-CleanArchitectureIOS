@@ -34,6 +34,7 @@ class Endpoint<R>: ResponseRequestable {
     let bodyParametersEncodable: Encodable?
     let bodyParameters: [String : Any]
     let bodyEncoder: BodyEncoder
+    let reponseDecoder: ResponseDecoder
         
     init(
         path: String,
@@ -42,6 +43,7 @@ class Endpoint<R>: ResponseRequestable {
         queryParameters: [String : Any] = [:],
         bodyParameters: [String : Any] = [:],
         bodyEncoder: BodyEncoder = JSONBodyEncoder(),
+        responseDecoder: ResponseDecoder = JSONResponseDecoder(),
         queryParametersEncodable: Encodable? = nil,
         bodyParametersEncodable: Encodable? = nil,
         isFullPath: Bool = false
@@ -55,6 +57,7 @@ class Endpoint<R>: ResponseRequestable {
         self.bodyParametersEncodable = bodyParametersEncodable
         self.bodyParameters = bodyParameters
         self.bodyEncoder = bodyEncoder
+        self.reponseDecoder = responseDecoder
     }
 }
 
