@@ -1,5 +1,5 @@
 //
-//  MoviewListView.swift
+//  MovieListView.swift
 //  Networking-CleanArchitectureIOS
 //
 //  Created by Đoàn Văn Khoan on 1/11/24.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct MoviewListView: View {
+struct MovieListView: View {
     
     @ObservedObject var viewModel: MoviesListViewModel
     

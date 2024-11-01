@@ -19,7 +19,6 @@ enum HTTPMethodType: String {
 
 // MARK: - Endpoint
 class Endpoint<R>: ResponseRequestable {
-
     
     /// The typealias is the associate type from ResponseRequestable
     typealias Response = R
@@ -34,7 +33,7 @@ class Endpoint<R>: ResponseRequestable {
     let bodyParametersEncodable: Encodable?
     let bodyParameters: [String : Any]
     let bodyEncoder: BodyEncoder
-    let reponseDecoder: ResponseDecoder
+    let responseDecoder: ResponseDecoder
         
     init(
         path: String,
@@ -57,7 +56,7 @@ class Endpoint<R>: ResponseRequestable {
         self.bodyParametersEncodable = bodyParametersEncodable
         self.bodyParameters = bodyParameters
         self.bodyEncoder = bodyEncoder
-        self.reponseDecoder = responseDecoder
+        self.responseDecoder = responseDecoder
     }
 }
 
@@ -156,6 +155,7 @@ protocol ResponseRequestable: Requestable {
     /// sociatedtype is a keyword used within protocols to define a placeholder type
     associatedtype Response
     
+    var responseDecoder: ResponseDecoder { get }
 }
 
 // MARK: - BodyEncoder
