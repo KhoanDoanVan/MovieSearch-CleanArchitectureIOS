@@ -50,7 +50,7 @@ extension MoviesResponseDTO {
         return .init(
             page: page,
             totalPages: totalPages,
-            movie: movies.map {
+            movies: movies.map {
                 $0.toDomain()
             }
         )

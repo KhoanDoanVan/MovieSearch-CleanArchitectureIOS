@@ -30,5 +30,5 @@ extension Movie {
 struct MoviesPage {
     let page: Int
     let totalPages: Int
-    let movie: [Movie]
+    let movies: [Movie]
 }
