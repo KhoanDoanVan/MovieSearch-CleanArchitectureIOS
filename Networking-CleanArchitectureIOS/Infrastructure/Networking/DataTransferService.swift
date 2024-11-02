@@ -28,6 +28,12 @@ protocol DataTransferErrorLogger {
     func log(error: Error)
 }
 
+extension DispatchQueue: DataTransferDispatchQueue {
+    func asyncExecute(work: @escaping () -> Void) {
+        async(group: nil, execute: work)
+    }
+}
+
 protocol DataTransferErrorResolver {
     func resolve(error: NetworkError) -> Error
 }
@@ -82,12 +88,17 @@ final class DefaultDataTransferService {
 
 extension DefaultDataTransferService: DataTransferService {
     
-    func request<T, E>(with endpoint: E, on queue: DataTransferDispatchQueue, completion: @escaping CompletionHandler<T>) -> (NetworkCancellable)? where T : Decodable, T == E.Response, E : ResponseRequestable {
+    func request<T: Decodable, E: ResponseRequestable>(
+        with endpoint: E,
+        on queue: DataTransferDispatchQueue,
+        completion: @escaping CompletionHandler<T>
+    ) -> NetworkCancellable? where T == E.Response {
         
         networkService.request(endpoint: endpoint) { result in
             switch result {
             /// Success
             case .success(let data):
+                print("SuccessFromHere")
                 let result: Result<T, DataTransferError> = self.decode(
                     data: data,
                     decoder: endpoint.responseDecoder
@@ -110,7 +121,7 @@ extension DefaultDataTransferService: DataTransferService {
     func request<T, E>(with endpoint: E, completion: @escaping CompletionHandler<T>) -> (NetworkCancellable)? where T : Decodable, T == E.Response, E : ResponseRequestable {
         request(
             with: endpoint,
-            on: DispatchQueue.main as! DataTransferDispatchQueue,
+            on: DispatchQueue.main,
             completion: completion
         )
     }
@@ -137,20 +148,18 @@ extension DefaultDataTransferService: DataTransferService {
     func request<E>(with endpoint: E, completion: @escaping CompletionHandler<Void>) -> (NetworkCancellable)? where E : ResponseRequestable, E.Response == () {
         request(
             with: endpoint,
-            on: DispatchQueue.main as! DataTransferDispatchQueue,
+            on: DispatchQueue.main,
             completion: completion
         )
     }
     
     // MARK: Private
-    private func decode<T: Decodable> (
+    private func decode<T: Decodable>(
         data: Data?,
         decoder: ResponseDecoder
     ) -> Result<T, DataTransferError> {
         do {
-            guard let data = data else {
-                return .failure(.noResponse)
-            }
+            guard let data = data else { return .failure(.noResponse) }
             let result: T = try decoder.decode(data)
             return .success(result)
         } catch {
@@ -171,7 +180,7 @@ final class DefaultDataTransferErrorLogger: DataTransferErrorLogger {
     
     func log(error: Error) {
         printIfDebug("-------------")
-        printIfDebug("\(error)")
+        printIfDebug("\(error.localizedDescription)")
     }
 }
 
@@ -188,24 +197,22 @@ final class DefaultDataTransferErrorResolver: DataTransferErrorResolver {
 // MARK: - Response Decoders
 class JSONResponseDecoder: ResponseDecoder {
     private let jsonDecoder = JSONDecoder()
-    init() {}
-    
+    init() { }
     func decode<T: Decodable>(_ data: Data) throws -> T {
         return try jsonDecoder.decode(T.self, from: data)
     }
 }
 
+
 /// Using in APIEndpoints at Data layer
 class RawDataResponseDecoder: ResponseDecoder {
-    init() {}
+    init() { }
     
     enum CodingKeys: String, CodingKey {
         case `default` = ""
     }
-    
     func decode<T: Decodable>(_ data: Data) throws -> T {
-        if T.self is Data.Type,
-           let data = data as? T {
+        if T.self is Data.Type, let data = data as? T {
             return data
         } else {
             let context = DecodingError.Context(

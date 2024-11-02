@@ -24,4 +24,13 @@ final class AppDIContainer {
         let apiDataNetwork = DefaultNetworkService(config: config)
         return DefaultDataTransferService(with: apiDataNetwork)
     }()
+    
+    // MARK: - DIContainers of scenes
+    func makeMoviesSceneDIContainer() -> MoviesScenceDIContainer {
+        let dependencies = MoviesScenceDIContainer.Dependencies(
+            apiDataTransferService: apiDataTransferService
+        )
+        
+        return MoviesScenceDIContainer(dependencies: dependencies)
+    }
 }

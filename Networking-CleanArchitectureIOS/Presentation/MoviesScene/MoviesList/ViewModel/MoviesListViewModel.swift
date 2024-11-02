@@ -22,6 +22,7 @@ final class MoviesListViewModel: ObservableObject {
     @Published var loading: MoviesListViewModelLoading? = nil
     @Published var query: String = ""
     @Published var error: String? = nil
+    @Published var isError: Bool = false
     
     private var currentPage: Int = 0
     private var totalPageCount: Int = 1
@@ -73,9 +74,9 @@ final class MoviesListViewModel: ObservableObject {
                 case .success(let page):
                     self?.appendPage(page)
                 case .failure(let error):
+                    self?.isError = true
                     self?.handle(error: error)
                 }
-                
                 self?.loading = nil
             }
         }
@@ -98,5 +99,10 @@ final class MoviesListViewModel: ObservableObject {
         totalPageCount = 1
         pages.removeAll()
         items.removeAll()
+    }
+    
+    // Search
+    func didSearch() {
+        update(movieQuery: MovieQuery(query: query))
     }
 }

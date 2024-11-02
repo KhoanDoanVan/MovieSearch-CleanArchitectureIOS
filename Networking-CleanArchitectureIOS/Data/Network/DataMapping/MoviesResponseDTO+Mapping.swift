@@ -4,13 +4,12 @@
 //
 //  Created by Đoàn Văn Khoan on 1/11/24.
 //
-
 import Foundation
 
 // MARK: - Data Transfer Object
 
 struct MoviesResponseDTO: Decodable {
-    private enum CodingsKey: String, CodingKey { /// CodingKey: keys for decode
+    private enum CodingKeys: String, CodingKey {
         case page
         case totalPages = "total_pages"
         case movies = "results"
@@ -22,7 +21,7 @@ struct MoviesResponseDTO: Decodable {
 
 extension MoviesResponseDTO {
     struct MovieDTO: Decodable {
-        private enum CodingsKey: String, CodingKey {
+        private enum CodingKeys: String, CodingKey {
             case id
             case title
             case genre
@@ -43,40 +42,32 @@ extension MoviesResponseDTO {
     }
 }
 
-// MARK: - Mapping To Domain
+// MARK: - Mappings to Domain
 
 extension MoviesResponseDTO {
     func toDomain() -> MoviesPage {
-        return .init(
-            page: page,
-            totalPages: totalPages,
-            movies: movies.map {
-                $0.toDomain()
-            }
-        )
+        return .init(page: page,
+                     totalPages: totalPages,
+                     movies: movies.map { $0.toDomain() })
     }
 }
 
 extension MoviesResponseDTO.MovieDTO {
     func toDomain() -> Movie {
-        return .init(
-            id: Movie.Identifier(id),
-            title: title,
-            genre: genre?.toDomain(),
-            posterPath: posterPath,
-            overview: overview,
-            releaseDate: dateFormatter.date(from: releaseDate ?? "")
-        )
+        return .init(id: Movie.Identifier(id),
+                     title: title,
+                     genre: genre?.toDomain(),
+                     posterPath: posterPath,
+                     overview: overview,
+                     releaseDate: dateFormatter.date(from: releaseDate ?? ""))
     }
 }
 
 extension MoviesResponseDTO.MovieDTO.GenreDTO {
     func toDomain() -> Movie.Genre {
         switch self {
-        case .adventure:
-            return .adventure
-        case .scienceFiction:
-            return .scienceFiction
+        case .adventure: return .adventure
+        case .scienceFiction: return .scienceFiction
         }
     }
 }

@@ -15,8 +15,19 @@ struct MovieListView: View {
         NavigationStack {
             VStack {
                 TextField("", text: $viewModel.query, prompt: Text(viewModel.searchBarTitle))
+                    .background(.gray)
                 
-                if viewModel.isEmpty {
+                Button(action: {
+                    viewModel.didSearch()
+                }) {
+                    Text("Search")
+                        .padding(8)
+                        .background(Color.blue)
+                        .foregroundColor(.white)
+                        .cornerRadius(8)
+                }
+                
+                if viewModel.items.isEmpty {
                     Text(viewModel.emptyDataTitle)
                 } else {
                     List(viewModel.items) { item in
@@ -33,6 +44,9 @@ struct MovieListView: View {
             }
             .navigationTitle(viewModel.screenTitle)
             .navigationBarTitleDisplayMode(.inline)
+            .alert(isPresented: $viewModel.isError) {
+                Alert(title: Text("Error"), message: Text(viewModel.error ?? "Error"))
+            }
         }
     }
 }

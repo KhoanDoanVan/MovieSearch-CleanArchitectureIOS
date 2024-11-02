@@ -20,24 +20,25 @@ final class DefaultSearchMoviesUseCase: SearchMoviesUseCase {
     
     // Properties
     private let moviesRepository: MoviesRepository
-    private let moviesQueriesRepository: MoviesQueriesRepository
+//    private let moviesQueriesRepository: MoviesQueriesRepository
     
     init(
-        moviesRepository: MoviesRepository,
-        moviesQueriesRepository: MoviesQueriesRepository
+        moviesRepository: MoviesRepository
+//        moviesQueriesRepository: MoviesQueriesRepository
     ) {
         self.moviesRepository = moviesRepository
-        self.moviesQueriesRepository = moviesQueriesRepository
+//        self.moviesQueriesRepository = moviesQueriesRepository
     }
     
     func execute(
         requestValue: SearchMoviesUseCaseRequestValue,
         completion: @escaping (Result<MoviesPage, Error>) -> Void
     ) -> (Cancellable)? {
-        
+                
         return moviesRepository.fetchMoviesList(
             query: requestValue.query,
-            page: requestValue.page) { result in
+            page: requestValue.page
+        ) { result in
                 
 //                if case .success = result {
 //                    self.moviesQueriesRepository.saveRecentQuery(query: requestValue.query) { _ in

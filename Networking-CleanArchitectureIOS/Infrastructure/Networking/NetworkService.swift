@@ -83,7 +83,7 @@ extension DefaultNetworkService: NetworkService {
     func request(endpoint: Requestable, completion: @escaping CompletionHandler) ->  NetworkCancellable? {
         do {
             let urlRequest = try endpoint.urlRequest(with: config)
-            return request(endpoint: endpoint, completion: completion)
+            return request(request: urlRequest, completion: completion)
         } catch {
             completion(.failure(.urlGeneration))
             return nil
@@ -105,7 +105,7 @@ final class DefaultNetworkSessionManager: NetworkSessionManager {
     ) -> NetworkCancellable {
         let task = URLSession.shared.dataTask(with: request, completionHandler: completion)
         task.resume()
-        return task as! NetworkCancellable
+        return task
     }
 }
 
@@ -123,7 +123,7 @@ final class DefaultNetworkErrorLogger: NetworkErrorLogger {
         print("---------")
         print("request: \(request.url!)")
         print("headers: \(request.allHTTPHeaderFields!)")
-        print("method: \(request.httpBody!)")
+        print("method: \(request.httpMethod!)")
         
         if let httpBody = request.httpBody,
            let result = ((try? JSONSerialization.jsonObject(with: httpBody, options: []) as? [String:AnyObject]) as [String:AnyObject]??)
@@ -165,6 +165,8 @@ enum NetworkError: Error {
     case generic(Error)
     case urlGeneration
 }
+
+extension URLSessionTask: NetworkCancellable { }
 
 // MARK: - Print If Debug
 func printIfDebug(_ string: String) {

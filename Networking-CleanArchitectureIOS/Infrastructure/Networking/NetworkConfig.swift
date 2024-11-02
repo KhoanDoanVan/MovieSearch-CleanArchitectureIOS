@@ -32,3 +32,5 @@ struct ApiDataNetworkConfig: NetworkConfigurable {
         self.queryParameters = queryParameters
     }
 }
+
+
